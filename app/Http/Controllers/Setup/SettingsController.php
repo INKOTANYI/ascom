@@ -26,7 +26,7 @@ class SettingsController extends Controller
 
         return Inertia::render('Setup/Settings', [
             'profile' => $school?->only([
-                'name', 'short_name', 'mineduc_code', 'school_type', 'ownership', 'province', 'district', 'sector',
+                'name', 'short_name', 'mineduc_code', 'school_type', 'ownership', 'province', 'district', 'sector', 'cell', 'village',
                 'phone', 'email', 'motto', 'domain', 'is_boarding',
             ]),
             'settings' => collect(Setting::values())->only(['brand_color', 'accent_color', 'default_language', 'sms_sender', 'example_data']),
@@ -51,6 +51,8 @@ class SettingsController extends Controller
             'province' => ['nullable', 'string', 'max:50'],
             'district' => ['required', 'string', 'max:50'],
             'sector' => ['required', 'string', 'max:50'],
+            'cell' => ['nullable', 'string', 'max:50'],
+            'village' => ['nullable', 'string', 'max:50'],
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:120'],
             'motto' => ['nullable', 'string', 'max:200'],

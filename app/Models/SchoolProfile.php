@@ -11,7 +11,7 @@ class SchoolProfile extends Model
     protected $table = 'school_profile';
 
     protected $fillable = [
-        'name', 'short_name', 'mineduc_code', 'school_type', 'ownership', 'province', 'district', 'sector',
+        'name', 'short_name', 'mineduc_code', 'school_type', 'ownership', 'province', 'district', 'sector', 'cell', 'village',
         'phone', 'email', 'logo_path', 'motto', 'domain', 'is_boarding',
     ];
 
@@ -23,11 +23,14 @@ class SchoolProfile extends Model
 
     protected static function booted(): void
     {
-        static::saved(fn () => Cache::forget('school_profile'));
+        static::saved(fn () => Cache::forget('school_profile.attributes'));
     }
 
     public static function current(): ?self
     {
-        return Cache::rememberForever('school_profile', fn () => static::query()->orderBy('id')->first());
+        // Only the column values are cached, so a cached copy never carries an old version of this class.
+        $attributes = Cache::rememberForever('school_profile.attributes', fn () => static::query()->orderBy('id')->first()?->getAttributes());
+
+        return $attributes ? (new static)->newFromBuilder($attributes) : null;
     }
 }

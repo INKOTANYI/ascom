@@ -31,6 +31,7 @@ export default function Settings({ profile, settings, options }) {
         school_type: profile?.school_type ?? 'mixed', ownership: profile?.ownership ?? '', province: profile?.province ?? '',
         district: profile?.district === 'To be completed' ? '' : (profile?.district ?? ''),
         sector: profile?.sector === 'To be completed' ? '' : (profile?.sector ?? ''),
+        cell: profile?.cell ?? '', village: profile?.village ?? '',
         phone: profile?.phone ?? '', email: profile?.email ?? '', motto: profile?.motto ?? '', domain: profile?.domain ?? '',
         is_boarding: profile?.is_boarding ?? false,
         brand_color: settings.brand_color, accent_color: settings.accent_color,
@@ -61,6 +62,8 @@ export default function Settings({ profile, settings, options }) {
                         {f('province', t('Province'), 'select', { options: options.provinces.map((p) => ({ value: p, label: p })) })}
                         {f('district', t('District'), 'text', { required: true })}
                         {f('sector', t('Sector'), 'text', { required: true })}
+                        {f('cell', t('Cell'))}
+                        {f('village', t('Village'))}
                         {f('phone', t('School phone'), 'text', { placeholder: '0788 123 456' })}
                         {f('email', t('School email'), 'email')}
                         {f('domain', t('Website address'), 'text', { placeholder: 'gskagombyi.rw' })}
