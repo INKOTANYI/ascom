@@ -1,4 +1,5 @@
 import { useT } from '@/lib/i18n';
+import { router } from '@inertiajs/react';
 import { X } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -74,4 +75,30 @@ export function PageHeader({ title, description, actions }) {
             {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
         </div>
     );
+}
+
+/** Page links of a Laravel paginator. */
+export function Pagination({ paginator }) {
+    const t = useT();
+    if (!paginator || paginator.last_page <= 1) return null;
+
+    return (
+        <nav className="flex flex-wrap items-center justify-center gap-1 border-t border-slate-200 p-3 dark:border-slate-800" aria-label={t('Pages')}>
+            {paginator.links.map((l, i) => (
+                <button key={i} type="button" disabled={!l.url} aria-current={l.active ? 'page' : undefined}
+                    onClick={() => l.url && router.get(l.url, {}, { preserveState: true, preserveScroll: false })}
+                    className={`min-w-9 rounded-lg px-3 py-1.5 text-sm ${l.active ? 'bg-brand text-white' : 'text-slate-600 hover:bg-slate-100 disabled:opacity-40 dark:text-slate-300 dark:hover:bg-slate-800'}`}
+                    dangerouslySetInnerHTML={{ __html: l.label }} />
+            ))}
+        </nav>
+    );
+}
+
+/** A person's photo, or their initials on the brand colour. */
+export function Avatar({ name, src, size = 'h-10 w-10', className = '' }) {
+    const initials = (name || '?').split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+
+    return src
+        ? <img src={src} alt="" className={`${size} shrink-0 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700 ${className}`} />
+        : <span aria-hidden="true" className={`${size} inline-flex shrink-0 items-center justify-center rounded-full bg-brand-soft text-sm font-bold text-brand-dark dark:bg-brand/20 dark:text-brand-soft ${className}`}>{initials}</span>;
 }

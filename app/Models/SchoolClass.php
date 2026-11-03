@@ -37,6 +37,17 @@ class SchoolClass extends Model
     }
 
     /** "S4" + "SOD" + "A" gives "S4 SOD A". */
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class, 'class_id');
+    }
+
+    /** Students currently in the class. */
+    public function activeEnrollments()
+    {
+        return $this->enrollments()->where('status', 'active');
+    }
+
     public static function makeName(Level $level, ?Combination $combination, ?string $stream): string
     {
         return trim(implode(' ', array_filter([$level->code, $combination?->code, $stream ? strtoupper($stream) : null])));

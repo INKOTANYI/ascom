@@ -20,15 +20,18 @@ class AccessSeeder extends Seeder
         'staff.manage' => 'Add and edit staff',
         'staff.view' => 'See the staff list',
         'users.manage' => 'Create accounts and assign roles',
+        'students.manage' => 'Register, enrol, transfer and import students and their guardians',
+        'students.view' => 'See students, guardians and class lists',
+        'audit.view' => 'See the history of changes (audit log)',
     ];
 
     public const ROLES = [
         'admin' => ['System administrator (company)', ['*']],
         'owner' => ['School owner', ['*']],
         'headteacher' => ['Head teacher', ['*']],
-        'dos' => ['Deputy head for studies (DOS)', ['calendar.manage', 'structure.manage', 'structure.view', 'staff.view']],
+        'dos' => ['Deputy head for studies (DOS)', ['calendar.manage', 'structure.manage', 'structure.view', 'staff.view', 'students.manage', 'students.view']],
         'discipline' => ['Deputy head for discipline', ['structure.view', 'staff.view']],
-        'bursar' => ['Bursar / accountant', ['structure.view']],
+        'bursar' => ['Bursar / accountant', ['structure.view', 'students.view']],
         'teacher' => ['Teacher', ['structure.view']],
         'parent' => ['Parent / guardian', []],
         'student' => ['Student', []],

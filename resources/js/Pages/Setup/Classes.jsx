@@ -1,9 +1,9 @@
 import Field from '@/Components/Field';
 import { Badge, Button, Card, Drawer, Empty, PageHeader } from '@/Components/Ui';
 import AppLayout from '@/Layouts/AppLayout';
-import { useT } from '@/lib/i18n';
+import { useCan, useT } from '@/lib/i18n';
 import { Link, router, useForm } from '@inertiajs/react';
-import { BookOpen, Pencil, Plus, Trash2, UserRound } from 'lucide-react';
+import { BookOpen, Pencil, Plus, Trash2, UserRound, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 const CYCLE_ORDER = ['nursery', 'primary', 'o_level', 'a_level', 'tvet'];
@@ -12,6 +12,7 @@ const CYCLE_LABEL = { nursery: 'Nursery', primary: 'Primary', o_level: 'O-level'
 /** Classes of one academic year, grouped by cycle. The class name is built from level, combination and stream. */
 export default function Classes({ year, years, classes, levels, combinations, teachers, canManage }) {
     const t = useT();
+    const can = useCan();
     const [editing, setEditing] = useState(null);
     const blank = { academic_year_id: year?.id ?? '', level_id: '', combination_id: '', stream: '', class_teacher_id: '', capacity: '' };
     const form = useForm(blank);
@@ -77,6 +78,12 @@ export default function Classes({ year, years, classes, levels, combinations, te
                                             <p className="mt-3 flex items-center gap-2 text-sm">
                                                 <UserRound className="h-4 w-4 text-slate-400" />
                                                 {c.class_teacher ? `${c.class_teacher.first_name} ${c.class_teacher.last_name}` : <span className="text-amber-700 dark:text-amber-400">{t('No class teacher yet')}</span>}
+                                            </p>
+                                            <p className="mt-1.5 flex items-center gap-2 text-sm">
+                                                <Users className="h-4 w-4 text-slate-400" />
+                                                {can('students.view')
+                                                    ? <Link href={route('students.index', { class_id: c.id })} className="hover:text-brand hover:underline">{t('Students: :n', { n: c.active_enrollments_count })}{c.capacity ? ` / ${c.capacity}` : ''}</Link>
+                                                    : <span>{t('Students: :n', { n: c.active_enrollments_count })}{c.capacity ? ` / ${c.capacity}` : ''}</span>}
                                             </p>
                                             <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800">
                                                 <Badge tone={c.class_subjects_count ? 'brand' : 'amber'}>{t('Subjects: :n', { n: c.class_subjects_count })}</Badge>

@@ -9,6 +9,7 @@ use App\Models\SchoolClass;
 use App\Models\SchoolProfile;
 use App\Models\Setting;
 use App\Models\Staff;
+use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Term;
 use App\Models\User;
@@ -34,12 +35,14 @@ class DashboardController extends Controller
             ['key' => 'staff', 'label' => __('Staff and teachers'), 'done' => Staff::query()->exists(), 'route' => 'setup.staff', 'permission' => 'staff.manage'],
             ['key' => 'classes', 'label' => __('Classes for this year'), 'done' => $classIds->isNotEmpty(), 'route' => 'setup.classes', 'permission' => 'structure.manage'],
             ['key' => 'subjects', 'label' => __('Subjects and teachers for each class'), 'done' => (clone $classSubjects)->whereNotNull('teacher_id')->exists(), 'route' => 'setup.classes', 'permission' => 'structure.manage'],
+            ['key' => 'students', 'label' => __('Students in their classes'), 'done' => $year && Student::query()->whereHas('enrollments', fn ($q) => $q->where('academic_year_id', $year->id))->exists(), 'route' => 'students.index', 'permission' => 'students.manage'],
             ['key' => 'users', 'label' => __('Accounts for the staff'), 'done' => User::query()->count() > 1, 'route' => 'setup.users', 'permission' => 'users.manage'],
         ];
 
         return Inertia::render('Dashboard', [
             'term' => $term ? ['number' => $term->term_number, 'year' => $year?->name, 'start' => $term->start_date->toDateString(), 'end' => $term->end_date->toDateString()] : null,
             'stats' => [
+                'students' => Student::query()->where('status', 'active')->count(),
                 'classes' => $classIds->count(),
                 'staff' => Staff::query()->where('is_active', true)->count(),
                 'subjects' => Subject::query()->where('is_active', true)->count(),

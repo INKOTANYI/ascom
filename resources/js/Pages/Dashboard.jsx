@@ -2,7 +2,7 @@ import { Card } from '@/Components/Ui';
 import AppLayout from '@/Layouts/AppLayout';
 import { useT } from '@/lib/i18n';
 import { Link, usePage } from '@inertiajs/react';
-import { ArrowRight, BookOpen, CalendarDays, CheckCircle2, Circle, GraduationCap, School, UserX } from 'lucide-react';
+import { ArrowRight, BookOpen, CalendarDays, CheckCircle2, Circle, GraduationCap, School, Users, UserX } from 'lucide-react';
 
 const fmt = (d, locale) => new Date(d + 'T00:00:00').toLocaleDateString(locale === 'rw' ? 'en-GB' : locale, { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -13,6 +13,7 @@ export default function Dashboard({ term, stats, steps }) {
     const pct = steps.length ? Math.round((done / steps.length) * 100) : 100;
 
     const cards = [
+        { label: 'Active students', value: stats.students, icon: Users },
         { label: 'Classes this year', value: stats.classes, icon: School },
         { label: 'Active staff', value: stats.staff, icon: GraduationCap },
         { label: 'Subjects', value: stats.subjects, icon: BookOpen },
@@ -33,7 +34,7 @@ export default function Dashboard({ term, stats, steps }) {
                 )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
                 {cards.map(({ label, value, icon: Icon, warn }) => (
                     <Card key={label} className="p-5">
                         <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${warn ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' : 'bg-brand-soft text-brand-dark dark:bg-brand/20 dark:text-brand-soft'}`}>

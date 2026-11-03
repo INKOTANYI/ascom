@@ -3,7 +3,7 @@ import { useCan, useT } from '@/lib/i18n';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     BookOpen, Building2, CalendarDays, CheckCircle2, ChevronDown, GraduationCap, Layers, LayoutDashboard, ListTree,
-    LogOut, Menu, Moon, School, Settings, Shapes, Sun, UserCog, Users, X, AlertTriangle,
+    FileSpreadsheet, HeartHandshake, LogOut, Menu, Moon, School, Settings, Shapes, Sun, UserCog, Users, X, AlertTriangle,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -19,6 +19,14 @@ const NAV = [
             { label: 'Subjects and modules', route: 'setup.subjects', icon: BookOpen, can: 'structure.view' },
             { label: 'Topics and units', route: 'setup.topics', icon: ListTree, can: 'structure.view' },
             { label: 'Classes', route: 'setup.classes', icon: School, can: 'structure.view', match: 'setup.classes*' },
+        ],
+    },
+    {
+        group: 'Students',
+        items: [
+            { label: 'Students', route: 'students.index', icon: Users, can: 'students.view', match: ['students.index', 'students.show', 'students.create', 'students.edit'] },
+            { label: 'Parents and guardians', route: 'guardians.index', icon: HeartHandshake, can: 'students.view' },
+            { label: 'Import from Excel', route: 'students.import', icon: FileSpreadsheet, can: 'students.manage' },
         ],
     },
     {
@@ -82,7 +90,7 @@ function Sidebar({ onNavigate }) {
                             {section.group && <p className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/50">{t(section.group)}</p>}
                             <ul className="space-y-0.5">
                                 {items.map((item) => {
-                                    const active = route().current(item.match || item.route);
+                                    const active = [].concat(item.match || item.route).some((name) => route().current(name));
                                     const Icon = item.icon;
                                     return (
                                         <li key={item.route}>

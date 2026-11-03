@@ -27,7 +27,7 @@ class ClassController extends Controller
 
         $classes = $year ? SchoolClass::query()->where('academic_year_id', $year->id)
             ->with(['level:id,code,name,cycle,order_no', 'combination:id,code,name', 'classTeacher:id,first_name,last_name'])
-            ->withCount('classSubjects')
+            ->withCount(['classSubjects', 'activeEnrollments'])
             ->get()
             ->sortBy(fn ($c) => [$c->level->order_no, $c->name])->values() : collect();
 
