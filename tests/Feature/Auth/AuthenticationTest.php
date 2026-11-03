@@ -12,34 +12,40 @@ class AuthenticationTest extends TestCase
 
     public function test_login_screen_can_be_rendered(): void
     {
-        $response = $this->get('/login');
-
-        $response->assertStatus(200);
+        $this->get('/login')->assertStatus(200);
     }
 
-    public function test_users_can_authenticate_using_the_login_screen(): void
+    public function test_users_can_sign_in_with_email_phone_or_username(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['username' => 'jean.uwimana', 'phone' => '+250788123456']);
 
-        $response = $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'password',
-        ]);
-
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        foreach ([$user->email, '0788 123 456', '788123456', '+250788123456', 'jean.uwimana', 'JEAN.UWIMANA'] as $login) {
+            $response = $this->post('/login', ['login' => $login, 'password' => 'password']);
+            $this->assertAuthenticatedAs($user);
+            $response->assertRedirect(route('dashboard', absolute: false));
+            $this->post('/logout');
+        }
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
         $user = User::factory()->create();
 
-        $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'wrong-password',
-        ]);
-
+        $this->post('/login', ['login' => $user->email, 'password' => 'wrong-password'])->assertSessionHasErrors('login');
         $this->assertGuest();
+    }
+
+    public function test_disabled_accounts_can_not_sign_in(): void
+    {
+        $user = User::factory()->create(['is_active' => false]);
+
+        $this->post('/login', ['login' => $user->email, 'password' => 'password']);
+        $this->assertGuest();
+    }
+
+    public function test_there_is_no_public_registration(): void
+    {
+        $this->get('/register')->assertNotFound();
     }
 
     public function test_users_can_logout(): void

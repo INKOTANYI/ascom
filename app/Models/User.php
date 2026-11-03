@@ -20,8 +20,14 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
+        'phone',
         'email',
         'password',
+        'role_id',
+        'language',
+        'is_active',
+        'last_login_at',
     ];
 
     /**
@@ -34,6 +40,9 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    /** Permission codes, loaded once per request. */
+    private ?array $permissionCodes = null;
+
     /**
      * Get the attributes that should be cast.
      *
@@ -43,7 +52,36 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function staff()
+    {
+        return $this->hasOne(Staff::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role?->name === 'admin';
+    }
+
+    public function permissionCodes(): array
+    {
+        return $this->permissionCodes ??= $this->role
+            ? $this->role->permissions()->pluck('code')->all()
+            : [];
+    }
+
+    public function hasPermission(string $code): bool
+    {
+        return $this->isAdmin() || in_array($code, $this->permissionCodes(), true);
     }
 }

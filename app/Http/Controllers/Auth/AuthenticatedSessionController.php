@@ -32,6 +32,8 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+        $request->user()->forceFill(['last_login_at' => now()])->save();
+        $request->session()->put('locale', $request->user()->language);
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

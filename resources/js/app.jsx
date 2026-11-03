@@ -5,10 +5,9 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    // Pages add the school's own name (from Settings) to their titles; nothing is hard-coded here.
+    title: (title) => title,
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.jsx`,

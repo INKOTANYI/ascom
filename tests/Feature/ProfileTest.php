@@ -12,34 +12,22 @@ class ProfileTest extends TestCase
 
     public function test_profile_page_is_displayed(): void
     {
-        $user = User::factory()->create();
-
-        $response = $this
-            ->actingAs($user)
-            ->get('/profile');
-
-        $response->assertOk();
+        $this->actingAs(User::factory()->create())->get('/profile')->assertOk();
     }
 
     public function test_profile_information_can_be_updated(): void
     {
         $user = User::factory()->create();
 
-        $response = $this
-            ->actingAs($user)
-            ->patch('/profile', [
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-            ]);
-
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
+        $this->actingAs($user)->patch('/profile', [
+            'name' => 'Test User', 'email' => 'Test@Example.com', 'phone' => '788123456', 'language' => 'rw',
+        ])->assertSessionHasNoErrors()->assertRedirect();
 
         $user->refresh();
-
         $this->assertSame('Test User', $user->name);
         $this->assertSame('test@example.com', $user->email);
+        $this->assertSame('+250788123456', $user->phone);
+        $this->assertSame('rw', $user->language);
         $this->assertNull($user->email_verified_at);
     }
 
@@ -47,53 +35,22 @@ class ProfileTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this
-            ->actingAs($user)
-            ->patch('/profile', [
-                'name' => 'Test User',
-                'email' => $user->email,
-            ]);
-
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
+        $this->actingAs($user)->patch('/profile', ['name' => 'Test User', 'email' => $user->email, 'language' => 'en'])
+            ->assertSessionHasNoErrors();
 
         $this->assertNotNull($user->refresh()->email_verified_at);
     }
 
-    public function test_user_can_delete_their_account(): void
+    public function test_a_user_must_keep_a_way_to_sign_in(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['username' => null]);
 
-        $response = $this
-            ->actingAs($user)
-            ->delete('/profile', [
-                'password' => 'password',
-            ]);
-
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/');
-
-        $this->assertGuest();
-        $this->assertNull($user->fresh());
+        $this->actingAs($user)->patch('/profile', ['name' => 'Test User', 'email' => '', 'phone' => '', 'language' => 'en'])
+            ->assertSessionHasErrors('phone');
     }
 
-    public function test_correct_password_must_be_provided_to_delete_account(): void
+    public function test_users_can_not_delete_their_own_account(): void
     {
-        $user = User::factory()->create();
-
-        $response = $this
-            ->actingAs($user)
-            ->from('/profile')
-            ->delete('/profile', [
-                'password' => 'wrong-password',
-            ]);
-
-        $response
-            ->assertSessionHasErrors('password')
-            ->assertRedirect('/profile');
-
-        $this->assertNotNull($user->fresh());
+        $this->actingAs(User::factory()->create())->delete('/profile')->assertStatus(405);
     }
 }
